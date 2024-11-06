@@ -3,8 +3,7 @@ import {useEffect, useRef, useState} from "react";
 export default function Juke() {
     const [currentTrack, setCurrentTrack] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [isMuted, setIsMuted] = useState(false);
-    const [autoplayFailed, setAutoplayFailed] = useState(false);
+    // const [isMuted, setIsMuted] = useState(false);
 
     const audioRef = useRef(new Audio());
 
@@ -14,6 +13,15 @@ export default function Juke() {
             url: "/suifighter/Street-Fighter-II-Ryu-Theme-Original.mp3",
         },
     ];
+
+    const handlePlayPause = () => {
+        setIsPlaying(!isPlaying);
+    };
+
+    const handleNext = () => {
+        setCurrentTrack((prev) => (prev + 1) % playlist.length);
+    };
+
 
     useEffect(() => {
         const audio = audioRef.current;
@@ -28,7 +36,7 @@ export default function Juke() {
         return () => {
             audio.removeEventListener("ended", handleNext);
         };
-    }, []);
+    }, [currentTrack, handleNext, playlist]);
 
     useEffect(() => {
         // Update audio source when current track changes
@@ -36,7 +44,7 @@ export default function Juke() {
         if (isPlaying) {
             audioRef.current.play();
         }
-    }, [currentTrack]);
+    }, [currentTrack, isPlaying, playlist]);
 
     useEffect(() => {
         // Handle play/pause
@@ -47,22 +55,15 @@ export default function Juke() {
         }
     }, [isPlaying]);
 
-    const handlePlayPause = () => {
-        setIsPlaying(!isPlaying);
-    };
 
-    const handleNext = () => {
-        setCurrentTrack((prev) => (prev + 1) % playlist.length);
-    };
-
-    const handlePrevious = () => {
-        setCurrentTrack((prev) => (prev - 1 + playlist.length) % playlist.length);
-    };
-
-    const toggleMute = () => {
-        setIsMuted(!isMuted);
-        audioRef.current.muted = !isMuted;
-    };
+    // const handlePrevious = () => {
+    //     setCurrentTrack((prev) => (prev - 1 + playlist.length) % playlist.length);
+    // };
+    //
+    // const toggleMute = () => {
+    //     setIsMuted(!isMuted);
+    //     audioRef.current.muted = !isMuted;
+    // };
 
     return (
         <div

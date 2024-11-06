@@ -66,8 +66,8 @@ export default function Juke() {
     // };
 
     return (
-        <div
+        <button
             className="absolute bottom-4 right-4 bg-[url('/juke.png')] bg-contain bg-center bg-no-repeat h-[12rem] w-[32rem]"
-            onClick={() => handlePlayPause()}></div>
+            onClick={() => handlePlayPause()}></button>
     );
 }

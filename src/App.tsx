@@ -91,7 +91,7 @@ function App() {
 
 
     const playSound = useCallback(() => {
-        const audio = new Audio('/attack.wav');
+        const audio = new Audio('/suifighter/attack.wav');
 
         // Reset audio to start
         audio.currentTime = 0;

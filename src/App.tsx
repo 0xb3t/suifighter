@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import {useCallback, useEffect, useState} from 'react'
 import {createClient} from "@supabase/supabase-js";
 
 
@@ -7,6 +7,29 @@ const supabase = createClient("https://yimbuaubbxhbtsqkmesm.supabase.co", "eyJhb
 type Record = { id: number, a: number, b: number };
 
 function App() {
+
+    const [aAttack, setAAttack] = useState(false);
+
+    const triggerAAttack = () => {
+        playSound()
+        incrementA()
+        setAAttack(true);
+        setTimeout(() => {
+            setAAttack(false);
+        }, 1000);
+    };
+
+    const [bAttack, setBAttack] = useState(false);
+
+    const triggerBAttack = () => {
+        playSound()
+        incrementB()
+        setBAttack(true);
+        setTimeout(() => {
+            setBAttack(false);
+        }, 1000);
+    };
+
     const [counts, setCounts] = useState<Record>({id: 1, a: 1, b: 1});
 
     useEffect(() => {
@@ -16,10 +39,7 @@ function App() {
             schema: "public"
         }, (x) => {
             setCounts(x.new as Record)
-            console.log(x)
-        }).subscribe(status => {
-            console.log(status)
-        });
+        }).subscribe();
 
         return () => {
             chan.unsubscribe()
@@ -69,6 +89,16 @@ function App() {
     const leftPercentage = total > 0 ? (counts.a / total) * 100 : 50;
     const rightPercentage = total > 0 ? (counts.b / total) * 100 : 50;
 
+
+    const playSound = useCallback(() => {
+        const audio = new Audio('/attack.wav');
+
+        // Reset audio to start
+        audio.currentTime = 0;
+        // Play the sound
+        audio.play().catch();
+    }, []);
+
     return (
         <main className="relative min-h-screen w-full bg-[url('/bg.jpeg')] bg-cover bg-center bg-no-repeat">
             <div className="w-full max-w-lg mx-auto">
@@ -101,18 +131,20 @@ function App() {
                     <span className="text-xs text-gray-500">{rightPercentage.toFixed(1)}%</span>
                 </div>
             </div>
-            <div className="absolute top-[45%] left-[30%] cursor-pointer" onClick={() => incrementA()}>
+            <div className="absolute top-[45%] left-1/2 -translate-x-[24rem] cursor-pointer"
+                 onClick={() => triggerAAttack()}>
                 <img
-                    src="https://placehold.co/600x1000"
+                    src={aAttack ? "./cat-attack.png" : "./cat-idle.png"}
                     alt="Left Fighter"
-                    className="h-64 w-48 object-contain"
+                    className="h-72 object-contain"
                 />
             </div>
-            <div className="absolute top-[45%] right-[30%] cursor-pointer" onClick={() => incrementB()}>
+            <div className="absolute top-[45%] right-1/2 translate-x-[24rem] cursor-pointer"
+                 onClick={() => triggerBAttack()}>
                 <img
-                    src="https://placehold.co/600x1000"
+                    src={bAttack ? "./dog-attack.png" : "./dog-idle.png"}
                     alt="Right Fighter"
-                    className="h-64 w-48 object-contain"
+                    className="h-72 object-contain"
                 />
             </div>
         </main>

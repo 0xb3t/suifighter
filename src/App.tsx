@@ -101,14 +101,14 @@ function App() {
                     <span className="text-xs text-gray-500">{rightPercentage.toFixed(1)}%</span>
                 </div>
             </div>
-            <div className="absolute top-[45%] left-[30%]" onClick={() => incrementA()}>
+            <div className="absolute top-[45%] left-[30%] cursor-pointer" onClick={() => incrementA()}>
                 <img
                     src="https://placehold.co/600x1000"
                     alt="Left Fighter"
                     className="h-64 w-48 object-contain"
                 />
             </div>
-            <div className="absolute top-[45%] right-[30%]" onClick={() => incrementB()}>
+            <div className="absolute top-[45%] right-[30%] cursor-pointer" onClick={() => incrementB()}>
                 <img
                     src="https://placehold.co/600x1000"
                     alt="Right Fighter"

@@ -3,9 +3,10 @@ import {useEffect, useRef, useState} from "react";
 export default function Juke() {
     const [currentTrack, setCurrentTrack] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
-    // const [isMuted, setIsMuted] = useState(false);
-
-    const audioRef = useRef(new Audio());
+    
+    // Keep audio instance in ref to persist between renders
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+    
 
     const playlist = [
         {
@@ -22,52 +23,53 @@ export default function Juke() {
         setCurrentTrack((prev) => (prev + 1) % playlist.length);
     };
 
-
+    // Initialize audio only once
     useEffect(() => {
-        const audio = audioRef.current;
-
-        // Set up audio event listeners
-        audio.addEventListener("ended", handleNext);
-
-        // Load first track
-        audio.src = playlist[currentTrack].url;
+        if (!audioRef.current) {
+            audioRef.current = new Audio(playlist[currentTrack].url);
+            audioRef.current.addEventListener("ended", handleNext);
+        }
 
         // Cleanup
         return () => {
-            audio.removeEventListener("ended", handleNext);
+            if (audioRef.current) {
+                audioRef.current.removeEventListener("ended", handleNext);
+                audioRef.current.pause();
+                audioRef.current = null;
+            }
         };
-    }, [currentTrack, handleNext, playlist]);
+    }, []);
 
+    // Handle track changes
     useEffect(() => {
-        // Update audio source when current track changes
-        audioRef.current.src = playlist[currentTrack].url;
-        if (isPlaying) {
-            audioRef.current.play();
+        if (audioRef.current) {
+            const currentTime = audioRef.current.currentTime;
+            const wasPlaying = !audioRef.current.paused;
+            
+            audioRef.current.src = playlist[currentTrack].url;
+            audioRef.current.currentTime = currentTime;
+            
+            if (wasPlaying) {
+                audioRef.current.play();
+            }
         }
-    }, [currentTrack, isPlaying, playlist]);
+    }, [currentTrack, playlist]);
 
+    // Handle play/pause
     useEffect(() => {
-        // Handle play/pause
+        if (!audioRef.current) return;
+
         if (isPlaying) {
-            audioRef.current.play();
+             audioRef.current.play();
         } else {
             audioRef.current.pause();
         }
     }, [isPlaying]);
 
-
-    // const handlePrevious = () => {
-    //     setCurrentTrack((prev) => (prev - 1 + playlist.length) % playlist.length);
-    // };
-    //
-    // const toggleMute = () => {
-    //     setIsMuted(!isMuted);
-    //     audioRef.current.muted = !isMuted;
-    // };
-
     return (
         <button
             className="absolute bottom-4 right-4 bg-[url('/juke.png')] bg-contain bg-center bg-no-repeat h-[12rem] w-[32rem]"
-            onClick={() => handlePlayPause()}></button>
+            onClick={handlePlayPause}
+        />
     );
 }
